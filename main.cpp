@@ -92,8 +92,8 @@ int main(int argc, char** argv) {
         std::getline(std::cin, expression);
 
         expression.erase(std::remove_if(expression.begin(), expression.end(), [](unsigned char c) { return std::isspace(c); }), expression.end());
-
-        if (expression == "exit"){
+        
+        if (expression == "exit" || expression == ""){
             break;
         }
 
