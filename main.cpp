@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <cctype>
+#include <algorithm>
 
 using namespace std;
 
@@ -88,7 +89,9 @@ int main(int argc, char** argv) {
     string expression;
     for (;;) {
         cout << "Enter example (for exit type exit) : ";
-        cin >> expression;
+        std::getline(std::cin, expression);
+
+        expression.erase(std::remove_if(expression.begin(), expression.end(), [](unsigned char c) { return std::isspace(c); }), expression.end());
 
         if (expression == "exit"){
             break;
