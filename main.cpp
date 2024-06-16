@@ -4,6 +4,8 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <readline/readline.h>
+#include<readline/history.h>
 
 using namespace std;
 
@@ -87,9 +89,10 @@ double evaluateExpression(const string& expression) {
 
 int main(int argc, char** argv) {
     string expression;
+
     for (;;) {
-        cout << "Enter example (for exit type exit) : ";
-        std::getline(std::cin, expression);
+        expression = readline("Enter example (for exit type exit): ");
+        add_history(expression.c_str());
 
         expression.erase(std::remove_if(expression.begin(), expression.end(), [](unsigned char c) { return std::isspace(c); }), expression.end());
         
