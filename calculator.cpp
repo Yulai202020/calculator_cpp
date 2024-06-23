@@ -7,8 +7,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-using namespace std;
-
 int precedence(char op) {
     if(op == '+' || op == '-')
         return 1;
@@ -27,16 +25,16 @@ double applyOperation(double a, double b, char op) {
     return 0;
 }
 
-double evaluateExpression(const string& expression) {
-    stack<double> values;
-    stack<char> ops;
+double evaluateExpression(const std::string expression) {
+    std::stack<double> values;
+    std::stack<char> ops;
 
     for(size_t i = 0; i < expression.size(); i++) {
         if(expression[i] == ' ')
             continue;
 
         if(isdigit(expression[i])) {
-            stringstream ss;
+            std::stringstream ss;
             while(i < expression.size() && (isdigit(expression[i]) || expression[i] == '.')) {
                 ss << expression[i++];
             }
