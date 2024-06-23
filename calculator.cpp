@@ -96,6 +96,10 @@ int main(int argc, char** argv) {
 
         expression.erase(std::remove_if(expression.begin(), expression.end(), [](unsigned char c) { return std::isspace(c); }), expression.end());
 
+        if (expression == "") {
+            continue;
+        }
+
         double result = evaluateExpression(expression);
         std::cout << "Result: " << result << std::endl;
     }
