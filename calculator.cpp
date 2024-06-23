@@ -6,6 +6,9 @@
 #include <algorithm>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <vector>
+
+std::vector<char> available_items = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*', '/', '(', ')'};
 
 int precedence(char op) {
     if(op == '+' || op == '-')
@@ -90,14 +93,30 @@ int main(int argc, char** argv) {
 
     for (;;) {
         expression = readline("Enter expression (press ctrl+C for exit): ");
+        // add to history
         add_history(expression.c_str());
 
+        // remove spaces
         expression.erase(std::remove_if(expression.begin(), expression.end(), [](unsigned char c) { return std::isspace(c); }), expression.end());
 
-        if (expression == "") {
+        // check expression
+        bool is_good = true;
+
+        for (char c : expression) {
+            auto it = std::find(available_items.begin(), available_items.end(), c);
+
+            if (it == available_items.end()) {
+                std::cout << "Invalid symbol." << std::endl;
+                is_good = false;
+                break;
+            }
+        }
+
+        if (!is_good || expression == "") {
             continue;
         }
 
+        // get answer
         double result = evaluateExpression(expression);
         std::cout << "Result: " << result << std::endl;
     }
