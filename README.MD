@@ -7,13 +7,11 @@ You can type expression with parentheses like, but you cant use powers:
 - (5 * 3) * 3
 
 # Compile
-
 ```bash
 g++ calculator.cpp -o calc -lreadline
 ```
 
 # Run
-
 ```bash
 ./calc
 ```
