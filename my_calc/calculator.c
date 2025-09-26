@@ -1,41 +1,51 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <ctype.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
+// expression max lenght
 #define MAX_EXPR_LEN 100
 
-char available_items[] = "0123456789+-*/()";
+// available symbols
+char* available_items = "0123456789+-*/()^.";
 
+// gets prioretet of operators
 int precedence(char op) {
-    if(op == '+' || op == '-')
+    if (op == '+' || op == '-')
         return 1;
-    if(op == '*' || op == '/')
+    if (op == '*' || op == '/')
         return 2;
+    if (op == '^')
+        return 3;
     return 0;
 }
 
+// get results
 double applyOperation(double a, double b, char op) {
     switch(op) {
         case '+': return a + b;
         case '-': return a - b;
         case '*': return a * b;
         case '/': return a / b;
+        case '^': return pow(a, b);
     }
     return 0;
 }
 
+// 
 double evaluateExpression(const char* expression) {
     double values[MAX_EXPR_LEN];
     char ops[MAX_EXPR_LEN];
     int valTop = -1, opsTop = -1;
 
     for(int i = 0; expression[i]; i++) {
+        // skip spaces
         if(expression[i] == ' ')
             continue;
-
+        // get whole digit (and float)
         if(isdigit(expression[i]) || expression[i] == '.') {
             char buffer[16];
             int bufIndex = 0;
@@ -47,18 +57,23 @@ double evaluateExpression(const char* expression) {
             i--;
 
             values[++valTop] = atof(buffer);
+        // add ( to operators list
         } else if(expression[i] == '(') {
             ops[++opsTop] = expression[i];
+        // 
         } else if(expression[i] == ')') {
+            // if was some operator (like ( or any operator and its not "()")
             while(opsTop != -1 && ops[opsTop] != '(') {
                 double val2 = values[valTop--];
                 double val1 = values[valTop--];
                 char op = ops[opsTop--];
                 values[++valTop] = applyOperation(val1, val2, op);
             }
-            opsTop--; 
+            opsTop--;
+        // if here is no primary operators (its ()) make sum or what ever is it by its owm primes
         } else {
-            while(opsTop != -1 && precedence(ops[opsTop]) >= precedence(expression[i])) {
+            // 
+            while (opsTop != -1 && precedence(ops[opsTop]) >= precedence(expression[i])) {
                 double val2 = values[valTop--];
                 double val1 = values[valTop--];
                 char op = ops[opsTop--];
@@ -81,13 +96,16 @@ double evaluateExpression(const char* expression) {
 int main(int argc, char** argv) {
     char* expression;
     while (1) {
+        // get expression
         expression = readline("Enter expression (press ctrl+C to exit): ");
         if (expression == NULL) {
             break;
         }
 
+        // add in history
         add_history(expression);
 
+        // check if expression is good
         int is_good = 1;
         for (int i = 0; expression[i]; i++) {
             if (strchr(available_items, expression[i]) == NULL && !isspace(expression[i])) {
@@ -97,11 +115,13 @@ int main(int argc, char** argv) {
             }
         }
 
+        // if expression isnt good continue running
         if (!is_good || strlen(expression) == 0) {
             free(expression);
             continue;
         }
 
+        // get and print result
         double result = evaluateExpression(expression);
         printf("Result: %f\n", result);
         free(expression);
