@@ -1,39 +1,31 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-
+#include <cstdint>
 #include <readline/readline.h>
 #include <readline/history.h>
 
 #include <nlohmann/json.hpp>
-
-#include "functions.h"
-#include "packToken.h"
-#include "containers.h"
 #include "shunting-yard.h"
-#include "shunting-yard-exceptions.h"
 
 using json = nlohmann::json;
 using namespace cparse;
 
 // expression max lenght
 #define MAX_EXPR_LEN 100
-
-packToken power(TokenMap scope) {
-    double lhs = scope["lhs"].asDouble();
-    double rhs = scope["rhs"].asDouble();
+packToken power(const packToken& left, const packToken& right, evaluationData* data) {
+    double lhs = left.asDouble();
+    double rhs = right.asDouble();
     return std::pow(lhs, rhs);
-}
-
-packToken fibonacci(TokenMap scope) {
-    return packToken(-1);
 }
 
 struct MyStartup {
     MyStartup() {
-        TokenMap& global = TokenMap::default_global();
-        global["fibonacci"] = CppFunction(&fibonacci, args_t{"N"});
-        // Operators::add_operator("**", CppFunction(&power, cparse::args_t{"lhs", "rhs"}));
+        // TokenMap& global = TokenMap::default_global();
+        // global["fibonacci"] = CppFunction(&fibonacci, args_t{"N"});
+
+        opMap_t& opMap = calculator::Default().opMap;
+        opMap.add({NUM, "^", NUM}, &power);
     }
 } MyStartupInstance;
 
