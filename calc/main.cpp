@@ -9,6 +9,8 @@
 
 #include <nlohmann/json.hpp>
 #include "headers/shunting-yard.h"
+// my lib
+#include "cef/cef_lib.h"
 
 using json = nlohmann::json;
 using namespace cparse;
@@ -178,23 +180,34 @@ int main(int argc, char** argv) {
 
         if (starts_with(expression, "exec")) {
             std::string filename = ((std::string) expression).substr(5);
-            std::ifstream inputFile(filename);
+            std::filesystem::path input_filepath(filename);
 
-            if (!inputFile.is_open()) {
-                std::cerr << "Could not open the file!" << std::endl;
-                continue;
+            if (input_filepath.extension() == ".json") {
+                std::ifstream inputFile(filename);
+                            
+                if (!inputFile.is_open()) {
+                    std::cerr << "Could not open the file!" << std::endl;
+                    continue;
+                }
+
+                json j;
+                inputFile >> j;
+
+                std::vector<std::string> values = j.get<std::vector<std::string>>();
+
+                // Print list
+                for (std::string value : values) {
+                    calculate(value.c_str(), vars);
+                }
+            } else if (input_filepath.extension() == ".log") {
+                vector<CEFEvent> events = parse_file(filename);
+
+                print_events(events);
+            } else {
+                cout << "Unknown file type." << std::endl;
             }
 
-            json j;
-            inputFile >> j;
-
-            std::vector<std::string> values = j.get<std::vector<std::string>>();
-
-            // Print list
-            for (std::string value : values) {
-                calculate(value.c_str(), vars);
-            }
-        } else if (starts_with(expression, "load")) {
+        } else if (starts_with(expression, "load_json")) {
             std::string filename = ((std::string) expression).substr(5);
 
             if (add_vars(vars, filename)) {
